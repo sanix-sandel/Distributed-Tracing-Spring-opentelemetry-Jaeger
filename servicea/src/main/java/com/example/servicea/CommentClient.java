@@ -11,10 +11,10 @@ import java.util.List;
 @Component
 public class CommentClient {
 
-    private RestTemplate restTemplate;
+    private RestTemplate restTemplate = new RestTemplate();
 
     public List<Comment>getComments(Long postId){
-        return Arrays.asList(restTemplate.getForObject("http://127.0.0.1:8082/"+postId, Comment[].class));
+        return Arrays.asList(restTemplate.getForObject("http://127.0.0.1:8081/"+postId, Comment[].class));
     }
 
 }

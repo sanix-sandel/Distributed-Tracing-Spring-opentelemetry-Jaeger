@@ -10,8 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("")
 public class PostController {
 
-    @GetMapping("postId")
+    private PostService postService = new PostService();
+
+    public PostController(PostService postService) {
+        this.postService = postService;
+    }
+
+    @GetMapping("{postId}")
     public ResponseEntity<Post>getPost(@PathVariable("postId") Long postId){
-        return ResponseEntity.ok(PostRepo.getPost(postId));
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 }
