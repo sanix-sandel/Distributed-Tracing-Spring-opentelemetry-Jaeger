@@ -19,4 +19,12 @@ public class Comment {
     public void setPostId(Long postId) {
         this.postId = postId;
     }
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "content='" + content + '\'' +
+                ", postId=" + postId +
+                '}';
+    }
 }
