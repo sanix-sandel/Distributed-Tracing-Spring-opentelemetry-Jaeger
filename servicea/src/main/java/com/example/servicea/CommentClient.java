@@ -1,14 +1,15 @@
 package com.example.servicea;
 
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.api.trace.TracerProvider;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.propagation.TextMapPropagator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,6 +36,8 @@ public class CommentClient {
     public List<Comment>getComments(Long postId, String traceId){
 
         HttpHeaders headers = new HttpHeaders();
+        Context context = Context.current();
+
         headers.add("traceId", traceId);
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -45,11 +48,19 @@ public class CommentClient {
 
         Span span = tracer.spanBuilder("Fetching comments from comment-service").startSpan();
 
+
         try{
             ResponseEntity<Comment[]> response = restTemplate.exchange("http://127.0.0.1:8081/"+postId, HttpMethod.GET, entity, Comment[].class);
             span.setAttribute("comments", response.getBody().toString());
+
             return Arrays.asList(response.getBody());
-        }finally {
+        }
+        catch(Exception e){
+            span.recordException(e);
+            span.setStatus(StatusCode.ERROR);
+            return Arrays.asList();
+        }
+        finally {
             span.end();
         }
 

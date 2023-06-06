@@ -51,7 +51,6 @@ public class PostController {
             span.setAttribute("post-id", postId);
             span.setAttribute("traceId", traceId);
             span.addEvent("The service has received a new external request");
-
             var response = postService.getPost(postId, traceId);
             return ResponseEntity.ok(response);
         }finally {

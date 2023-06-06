@@ -20,6 +20,9 @@ public class PostService {
     @Autowired
     private CommentClient commentClient;
 
+    @Autowired
+    private PostRepo postRepo;
+
     @Value("${spring.application.name}")
     private String applicationName;
 
@@ -28,10 +31,10 @@ public class PostService {
 
         Tracer tracer = tracerProvider.get("Get-Post");
 
-        Span span = tracer.spanBuilder("Fetching Post from DB").startSpan();
+        Span span = tracer.spanBuilder("Business logic").startSpan();
 
         try{
-            Post post = PostRepo.posts.stream().filter(p -> p.getId()==postId).findFirst().get();
+            Post post = postRepo.getPost(postId);
             span.setAttribute("post", post.toString());
             post.setComments(commentClient.getComments(postId, traceId));
             return post;

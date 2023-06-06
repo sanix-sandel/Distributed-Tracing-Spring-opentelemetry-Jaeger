@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: distributed-tracing
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: post-service
+        image: sanixsandel/post_service:1.0.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m" 
+        ports:
+        - containerPort: 8000
+      # - name: comment-service
+      #   image: sanixsandel/comment_service:1.0.2
+      #   resources:
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #   ports:
+      #   - containerPort: 8081
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: service-post
+# spec:
+#   selector:
+#     app: myapp
+#   type: LoadBalancer  
+#   ports:
+#   - port: 9000
+#     targetPort: 8000
+#     # nodePort: 30001
+          
