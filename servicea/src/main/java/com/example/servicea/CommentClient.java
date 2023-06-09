@@ -1,9 +1,6 @@
 package com.example.servicea;
 
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.StatusCode;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.api.trace.TracerProvider;
+import io.opentelemetry.api.trace.*;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 import org.slf4j.Logger;
@@ -26,9 +23,10 @@ public class CommentClient {
     private static final Logger logger = LoggerFactory.getLogger(CommentClient.class);
 
     @Autowired
-    private TracerProvider tracerProvider;
+    private Tracer tracer;
 
-    private RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -44,9 +42,9 @@ public class CommentClient {
 
         logger.info(applicationName+" - "+traceId+" - Fetching comments from comment service");
 
-        Tracer tracer = tracerProvider.get("Get-Post");
-
-        Span span = tracer.spanBuilder("Fetching comments from comment-service").startSpan();
+        Span span = tracer.spanBuilder("Fetching comments from comment-service")
+                .setSpanKind(SpanKind.CLIENT)
+                .startSpan();
 
 
         try{

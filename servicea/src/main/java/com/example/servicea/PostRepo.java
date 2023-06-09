@@ -15,7 +15,7 @@ import java.util.List;
 public class PostRepo {
 
     @Autowired
-    private TracerProvider tracerProvider;
+    private Tracer tracer;
 
     public List<Post>posts = Arrays.asList(
             new Post(1L, "post 1", ""),
@@ -26,7 +26,6 @@ public class PostRepo {
     );
 
     public Post getPost(Long postId){
-        Tracer tracer = tracerProvider.get("Get-Post");
 
         Span span = tracer.spanBuilder("DB query").startSpan();
 

@@ -15,7 +15,7 @@ public class PostService {
     private static final Logger logger = LoggerFactory.getLogger(PostController.class);
 
     @Autowired
-    private TracerProvider tracerProvider;
+    private Tracer tracer;
 
     @Autowired
     private CommentClient commentClient;
@@ -26,14 +26,15 @@ public class PostService {
     @Value("${spring.application.name}")
     private String applicationName;
 
-    public Post getPost(Long postId, String traceId){
-        logger.info(applicationName+" - "+traceId+" - Fetching post from DB");
-
-        Tracer tracer = tracerProvider.get("Get-Post");
+    public Post getPost(Long postId){
 
         Span span = tracer.spanBuilder("Business logic").startSpan();
+        var traceId = span.getSpanContext().getTraceId();
 
         try{
+
+            logger.info(applicationName+" - "+traceId+" - Fetching post from DB");
+
             Post post = postRepo.getPost(postId);
             span.setAttribute("post", post.toString());
             post.setComments(commentClient.getComments(postId, traceId));

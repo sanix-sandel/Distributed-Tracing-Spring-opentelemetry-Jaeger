@@ -27,7 +27,7 @@ public class PostController {
     private PostService postService = new PostService();
 
     @Autowired
-    private TracerProvider tracerProvider;
+    private Tracer tracer;
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -39,11 +39,10 @@ public class PostController {
     @GetMapping("{postId}")
     public ResponseEntity<Post>getPost(@PathVariable("postId") Long postId){
 
-        String traceId = UUID.randomUUID().toString();
-
-        Tracer tracer = tracerProvider.get("Get-Post");
 
         Span span = tracer.spanBuilder("Received external request").startSpan();
+
+        var traceId = span.getSpanContext().getTraceId();
         
         try{
             logger.info(applicationName+" - "+traceId+" - Received external client request ");
@@ -51,7 +50,7 @@ public class PostController {
             span.setAttribute("post-id", postId);
             span.setAttribute("traceId", traceId);
             span.addEvent("The service has received a new external request");
-            var response = postService.getPost(postId, traceId);
+            var response = postService.getPost(postId);
             return ResponseEntity.ok(response);
         }finally {
             span.end();
